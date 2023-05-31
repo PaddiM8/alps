@@ -18,6 +18,7 @@ require (
 	github.com/emersion/go-webdav v0.4.0
 	github.com/fernet/fernet-go v0.0.0-20211208181803-9f70042a33ee
 	github.com/google/uuid v1.3.0
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/labstack/gommon v0.4.0

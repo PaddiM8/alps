@@ -78,6 +78,10 @@ func (s *Session) Username() string {
 	return s.username
 }
 
+func (s *Session) NewIMAP() (*imapclient.Client, error) {
+	return s.manager.connectIMAP(s.username, s.password)
+}
+
 // DoIMAP executes an IMAP operation on this session. The IMAP client can only
 // be used from inside f.
 func (s *Session) DoIMAP(f func(*imapclient.Client) error) error {
@@ -86,7 +90,7 @@ func (s *Session) DoIMAP(f func(*imapclient.Client) error) error {
 
 	if s.imapConn == nil {
 		var err error
-		s.imapConn, err = s.manager.connectIMAP(s.username, s.password)
+		s.imapConn, err = s.NewIMAP()
 		if err != nil {
 			s.Close()
 			return fmt.Errorf("failed to re-connect to IMAP server: %v", err)

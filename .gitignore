@@ -6,6 +6,7 @@
 !/plugins/base
 !/plugins/caldav
 !/plugins/carddav
+!/plugins/events
 !/plugins/lua
 !/plugins/viewhtml
 !/plugins/viewmultipart

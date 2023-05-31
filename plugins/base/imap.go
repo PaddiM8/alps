@@ -388,7 +388,10 @@ func (msg *IMAPMessage) HasFlag(flag string) bool {
 }
 
 func listMessages(conn *imapclient.Client, mbox *MailboxStatus, page, messagesPerPage int) ([]IMAPMessage, error) {
-	if err := ensureMailboxSelected(conn, mbox.Name); err != nil {
+	//if err := ensureMailboxSelected(conn, mbox.Name); err != nil {
+	//	return nil, err
+	//}
+	if _, err := conn.Select(mbox.Name, false); err != nil {
 		return nil, err
 	}
 

@@ -237,6 +237,14 @@ func (s *Server) Reload() error {
 	return s.load()
 }
 
+func (s *Server) RLock() {
+	s.mutex.RLock()
+}
+
+func (s *Server) RUnlock() {
+	s.mutex.RUnlock()
+}
+
 // Logger returns this server's logger.
 func (s *Server) Logger() echo.Logger {
 	return s.e.Logger
