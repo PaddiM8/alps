@@ -8,4 +8,5 @@
 !/plugins/carddav
 !/plugins/lua
 !/plugins/viewhtml
+!/plugins/viewmultipart
 !/plugins/viewtext

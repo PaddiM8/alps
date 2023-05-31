@@ -58,7 +58,9 @@ func (viewer) ViewMessagePart(ctx *alps.Context, msg *alpsbase.IMAPMessage, part
 	if err != nil {
 		return nil, err
 	}
-	if !strings.EqualFold(mimeType, "text/plain") {
+	mimeType = strings.ToLower(mimeType)
+	if !strings.HasPrefix(mimeType, "message/") &&
+		!strings.HasPrefix(mimeType, "text/") {
 		return nil, alpsbase.ErrViewUnsupported
 	}
 

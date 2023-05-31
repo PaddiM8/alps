@@ -479,7 +479,7 @@ func handleGetPart(ctx *alps.Context, raw bool) error {
 		return ctx.Stream(http.StatusOK, mimeType, part.Body)
 	}
 
-	view, err := viewMessagePart(ctx, msg, part)
+	view, err := ViewMessagePart(ctx, msg, part)
 	if err == ErrViewUnsupported {
 		view = nil
 	}

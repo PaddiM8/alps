@@ -26,7 +26,7 @@ func RegisterViewer(viewer Viewer) {
 	viewers = append(viewers, viewer)
 }
 
-func viewMessagePart(ctx *alps.Context, msg *IMAPMessage, part *message.Entity) (interface{}, error) {
+func ViewMessagePart(ctx *alps.Context, msg *IMAPMessage, part *message.Entity) (interface{}, error) {
 	for _, viewer := range viewers {
 		v, err := viewer.ViewMessagePart(ctx, msg, part)
 		if err == ErrViewUnsupported {
