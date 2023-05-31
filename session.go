@@ -19,7 +19,7 @@ import (
 )
 
 // TODO: make this configurable
-const sessionDuration = 30 * time.Minute
+const sessionDuration = 365 * 24 * 60 * time.Minute
 const maxAttachmentSize = 32 << 20 // 32 MiB
 
 func generateToken() (string, error) {
