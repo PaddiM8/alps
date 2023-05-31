@@ -84,11 +84,33 @@ type OutgoingMessage struct {
 	MessageID   string
 	InReplyTo   string
 	Text        string
+	Html        string
 	Attachments []Attachment
 }
 
 func (msg *OutgoingMessage) ToString() string {
 	return strings.Join(msg.To, ", ")
+}
+
+func writePart(iw *mail.InlineWriter, content_type string, body string) error {
+	var th mail.InlineHeader
+	th.SetContentType(content_type, map[string]string{"charset": "utf-8"})
+	tw, err := iw.CreatePart(th)
+
+	if err != nil {
+		return fmt.Errorf("failed to create text part: %v", err)
+	}
+	defer tw.Close()
+
+	if _, err := io.WriteString(tw, body); err != nil {
+		return fmt.Errorf("failed to write text part: %v", err)
+	}
+
+	if err := tw.Close(); err != nil {
+		return fmt.Errorf("failed to close text part: %v", err)
+	}
+
+	return nil
 }
 
 func writeAttachment(mw *mail.Writer, att Attachment) error {
@@ -159,21 +181,22 @@ func (msg *OutgoingMessage) WriteTo(w io.Writer) error {
 		return fmt.Errorf("failed to create mail writer: %v", err)
 	}
 
-	var th mail.InlineHeader
-	th.Set("Content-Type", "text/plain; charset=utf-8")
-
-	tw, err := mw.CreateSingleInline(th)
+	iw, err := mw.CreateInline()
 	if err != nil {
-		return fmt.Errorf("failed to create text part: %v", err)
+		return fmt.Errorf("failed to create multipart: %v", err)
 	}
-	defer tw.Close()
+	defer iw.Close()
 
-	if _, err := io.WriteString(tw, msg.Text); err != nil {
-		return fmt.Errorf("failed to write text part: %v", err)
+	// text/plain
+	writePart(iw, "text/plain", msg.Text)
+
+	// text/html
+	if msg.Html != "" {
+		writePart(iw, "text/html", msg.Html)
 	}
 
-	if err := tw.Close(); err != nil {
-		return fmt.Errorf("failed to close text part: %v", err)
+	if err := iw.Close(); err != nil {
+		return fmt.Errorf("failed to close multipart: %v", err)
 	}
 
 	for _, att := range msg.Attachments {

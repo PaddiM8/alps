@@ -595,6 +595,7 @@ func handleCompose(ctx *alps.Context, msg *OutgoingMessage, options *composeOpti
 		msg.To = parseAddressList(ctx.FormValue("to"))
 		msg.Subject = ctx.FormValue("subject")
 		msg.Text = ctx.FormValue("text")
+		msg.Html = ctx.FormValue("html")
 		msg.InReplyTo = ctx.FormValue("in_reply_to")
 		msg.MessageID = ctx.FormValue("message_id")
 
@@ -742,6 +743,7 @@ func handleComposeNew(ctx *alps.Context) error {
 		MessageID: "<" + mid + ">",
 		InReplyTo: ctx.QueryParam("in-reply-to"),
 		Text:      text,
+		Html:      ctx.QueryParam("html"),
 	}, &composeOptions{})
 }
 
@@ -835,11 +837,8 @@ func handleReply(ctx *alps.Context) error {
 				return err
 			}
 		} else if mimeType == "text/html" {
-			text, err := html2text.FromReader(part.Body, html2text.Options{})
-			if err != nil {
-				return err
-			}
-			msg.Text, err = quote(strings.NewReader(text))
+			text, err := io.ReadAll(part.Body)
+			msg.Text = string(text)
 			if err != nil {
 				return nil
 			}
