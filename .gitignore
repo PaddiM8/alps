@@ -1,4 +1,5 @@
 /koushin
+/db
 /themes/*
 !/themes/sourcehut
 !/themes/alps
@@ -9,5 +10,6 @@
 !/plugins/events
 !/plugins/lua
 !/plugins/viewhtml
-!/plugins/viewmultipart
+!/plugins/
+!/plugins/usersettings
 !/plugins/viewtext
