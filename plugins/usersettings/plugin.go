@@ -34,7 +34,6 @@ func (p *userSettingsPlugin) SetRoutes(group *echo.Group) {
 			if err == nil {
 				json = string(result.Value)
 			} else {
-				fmt.Println(err)
 				json = "{}"
 			}
 
