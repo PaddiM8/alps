@@ -42,7 +42,7 @@ func init() {
 			return echo.NewHTTPError(http.StatusBadRequest, "invalid URL")
 		}
 
-		if u.Scheme != "https" {
+		if !(u.Scheme == "https" || ctx.QueryParam("allow-http") == "1" && u.Scheme == "http") {
 			return echo.NewHTTPError(http.StatusBadRequest, "invalid scheme")
 		}
 
