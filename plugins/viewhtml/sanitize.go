@@ -74,12 +74,17 @@ type sanitizer struct {
 	msg                  *alpsbase.IMAPMessage
 	allowRemoteResources bool
 	hasRemoteResources   bool
+	removeContent        bool
 }
 
 func (san *sanitizer) sanitizeImageURL(src string) string {
 	u, err := url.Parse(src)
 	if err != nil {
 		return "about:blank"
+	}
+
+	if !san.removeContent && strings.ToLower(u.Scheme) != "cid" {
+		return src
 	}
 
 	switch strings.ToLower(u.Scheme) {
@@ -144,6 +149,10 @@ func (san *sanitizer) sanitizeCSSRule(rule *css.Rule) {
 }
 
 func (san *sanitizer) sanitizeNode(n *html.Node) {
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		san.sanitizeNode(c)
+	}
+
 	if n.Type == html.ElementNode {
 		if strings.EqualFold(n.Data, "img") {
 			for i := range n.Attr {
@@ -152,7 +161,13 @@ func (san *sanitizer) sanitizeNode(n *html.Node) {
 					attr.Val = san.sanitizeImageURL(attr.Val)
 				}
 			}
-		} else if strings.EqualFold(n.Data, "style") {
+		}
+
+		if !san.removeContent {
+			return
+		}
+
+		if strings.EqualFold(n.Data, "style") {
 			var s string
 			c := n.FirstChild
 			for c != nil {
@@ -202,10 +217,6 @@ func (san *sanitizer) sanitizeNode(n *html.Node) {
 			}
 		}
 	}
-
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		san.sanitizeNode(c)
-	}
 }
 
 func (san *sanitizer) sanitizeHTML(b []byte) ([]byte, error) {
@@ -223,6 +234,10 @@ func (san *sanitizer) sanitizeHTML(b []byte) ([]byte, error) {
 	b = buf.Bytes()
 
 	// bluemonday must always be run last
+	if !san.removeContent {
+		return b, nil
+	}
+
 	p := bluemonday.UGCPolicy()
 
 	// TODO: use bluemonday's AllowStyles once it's released and

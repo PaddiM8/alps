@@ -41,18 +41,17 @@ func (viewer) ViewMessagePart(ctx *alps.Context, msg *alpsbase.IMAPMessage, part
 	}
 
 	hasRemoteResources := false
-	if ctx.QueryParam("sanitize") != "0" {
-		san := sanitizer{
-			msg:                  msg,
-			allowRemoteResources: allowRemoteResources,
-		}
-		body, err = san.sanitizeHTML(body)
-		if err != nil {
-			return nil, fmt.Errorf("failed to sanitize HTML part: %v", err)
-		}
-
-		hasRemoteResources = san.hasRemoteResources
+	san := sanitizer{
+		msg:                  msg,
+		allowRemoteResources: allowRemoteResources,
+		removeContent:        ctx.QueryParam("sanitize") != "0",
 	}
+	body, err = san.sanitizeHTML(body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to sanitize HTML part: %v", err)
+	}
+
+	hasRemoteResources = san.hasRemoteResources
 
 	ctx.Set("viewhtml.hasRemoteResources", hasRemoteResources)
 
