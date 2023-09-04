@@ -48,19 +48,14 @@ func viewAlternative(ctx *alps.Context, msg *alpsbase.IMAPMessage, part *message
 
 	// TODO: For better reliability, traverse the tree rather than relying on convention.
 	first, err := multipartReader.NextPart()
-	if err != nil {
-		return nil, err
-	}
-	if preferredContentType == "text/plain" {
-		return alpsbase.ViewMessagePart(ctx, msg, first)
-	}
+    rendered, _ := alpsbase.ViewMessagePart(ctx, msg, first)
 
 	second, err := multipartReader.NextPart()
 	if preferredContentType == "text/html" && err == nil {
-		return alpsbase.ViewMessagePart(ctx, msg, second)
+		rendered, err = alpsbase.ViewMessagePart(ctx, msg, second)
 	}
 
-	return alpsbase.ViewMessagePart(ctx, msg, first)
+	return rendered, err
 }
 
 func viewMixed(ctx *alps.Context, msg *alpsbase.IMAPMessage, part *message.Entity) (interface{}, error) {
